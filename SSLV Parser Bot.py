@@ -233,7 +233,12 @@ def fetch_results(state: dict) -> list:
         title_tag = row.select_one("a.am")
         link = urljoin(BASE_URL, title_tag['href']) if title_tag else "#"
 
-        brand = "Audi"
+        brand_href = state["brand_href"]
+        brand_name = "Unknown"
+        for name, href in brand_links:
+            if href == brand_href:
+                brand_name = name
+                break
         model = cols[3].text.strip() if len(cols) > 3 else "Unknown"
         year = cols[4].text.strip() if len(cols) > 4 else "Unknown"
         mileage = cols[6].text.strip() if len(cols) > 6 else None
@@ -242,9 +247,9 @@ def fetch_results(state: dict) -> list:
 
         # Формат: Audi A6 - 2006 - 306 tūkst. - 2,450 €
         if mileage:
-            full_title = f"{brand} {model} - {year} - {mileage} - {price}"
+            full_title = f"{brand_name} {model} - {year} - {mileage} - {price}"
         else:
-            full_title = f"{brand} {model} - {year} - {price}"
+            full_title = f"{brand_name} {model} - {year} - {price}"
 
         results.append((full_title, link))
 
