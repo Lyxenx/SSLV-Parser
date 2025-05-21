@@ -11,8 +11,8 @@ BOT_TOKEN = "7252666994:AAHYZdZlcDpbmexbU69t9bv_xmi8mQtKkZc"
 BASE_URL = "https://www.ss.lv"
 BRANDS_PER_PAGE = 12
 
-brand_links = []
-user_states = {}
+brand_links = [] # Saglabā sarakstu ar auto marku saitēm
+user_states = {} # Saglabā katra lietotāja izvēli
 
 sorting_options = {
     "date_desc":    "",
@@ -60,14 +60,14 @@ filter_labels = {
     "sid": "Bargain Type"
 }
 
-def fetch_brands():
+def fetch_brands(): # Nolasa auto marku sarakstu no ss.lv
     url = f"{BASE_URL}/lv/transport/cars/"
     resp = requests.get(url)
     resp.raise_for_status()
     soup = BeautifulSoup(resp.text, "html.parser")
     brand_links = []
     pattern = re.compile(r"^/lv/transport/cars/[^/]+/$")
-    for a in soup.select("h4 > a[href]"):
+    for a in soup.select("h4 > a[href]"): # Meklē saites uz katras markas lapām
         href = a["href"]
         if pattern.match(href):
             name = a.text.strip()
@@ -133,7 +133,7 @@ def parse_filter_options(brand_href: str) -> dict:
 
     return opts
 
-def labelize(name: str) -> str:
+def labelize(name: str) -> str:# Veido tekstuālāko filtra nosaukumu
     return name.replace("_", " ").title()
 
 def get_filter_keyboard(user_id: int) -> InlineKeyboardMarkup:
