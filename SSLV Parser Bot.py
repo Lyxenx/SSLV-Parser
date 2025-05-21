@@ -110,7 +110,6 @@ def parse_filter_options(brand_href: str) -> dict:
     soup = BeautifulSoup(resp.text, "html.parser")
     opts = {}
 
-    # Сначала select'ы как раньше
     for sel in soup.find_all("select"):
         name = sel.get("name")
         if not name:
@@ -125,11 +124,10 @@ def parse_filter_options(brand_href: str) -> dict:
         if choices:
             opts[name] = choices
 
-    # Добавляем поддержку input (например, цена)
     for inp in soup.find_all("input"):
         name = inp.get("name")
-        if name and "topt[8]" in name:  # поля цены
-            opts[name] = None  # просто помечаем, что поле доступно
+        if name and "topt[8]" in name:
+            opts[name] = None
 
     return opts
 
@@ -142,7 +140,7 @@ def get_filter_keyboard(user_id: int) -> InlineKeyboardMarkup:
 
     buttons = []
     for k in opts.keys():
-        readable = filter_labels.get(k, k)  # читаемое имя или fallback
+        readable = filter_labels.get(k, k)
         buttons.append(InlineKeyboardButton(readable, callback_data=f"filter_sel:{k}"))
 
     rows = [buttons[i:i+2] for i in range(0, len(buttons), 2)]
@@ -155,14 +153,12 @@ def get_filter_keyboard(user_id: int) -> InlineKeyboardMarkup:
 def get_filter_values_keyboard(field: str, user_id: int) -> InlineKeyboardMarkup:
     opts = user_states[user_id]["filter_options"][field]
 
-    # Если это числовое поле (например, цена)
     if opts is None:
         return InlineKeyboardMarkup([
             [InlineKeyboardButton("💬 Enter Value", callback_data=f"numeric_input:{field}")],
             [InlineKeyboardButton("← Back", callback_data="filter_back")]
         ])
 
-    # Обычные поля (select)
     buttons = [
         InlineKeyboardButton(label, callback_data=f"filter_val:{field}:{val}")
         for val, label in opts
@@ -175,7 +171,6 @@ def format_user_selection(user_id: int) -> str:
     state = user_states[user_id]
     lines = []
 
-    # Бренд
     if state["brand_href"] == "all":
         lines.append("🚗 Brand: All")
     else:
@@ -184,21 +179,19 @@ def format_user_selection(user_id: int) -> str:
                 lines.append(f"🚗 Brand: {name}")
                 break
 
-    # Сортировка
     sort_key = state.get("sort", "date_desc")
     sort_label = sorting_labels.get(sort_key, "Unknown")
     lines.append(f"🔃 Sort: {sort_label}")
 
-    # Фильтры
     filters = state.get("filters", {})
     if filters:
         lines.append("🎛 Filters:")
         opts = state["filter_options"]
         for key, val in filters.items():
-            label = filter_labels.get(key, labelize(key))  # ← заменено здесь
+            label = filter_labels.get(key, labelize(key))
             opt_values = opts.get(key)
             if opt_values is None:
-                value_label = val  # просто отобразим введённое число
+                value_label = val
             else:
                 value_label = next((lbl for v, lbl in opt_values if v == val), val)
             lines.append(f" • {label}: {value_label}")
@@ -245,7 +238,6 @@ def fetch_results(state: dict) -> list:
         price_td = cols[7].get_text(strip=True) if len(cols) > 7 else "Unknown"
         price = price_td.replace('\xa0', ' ').strip()
 
-        # Формат: Audi A6 - 2006 - 306 tūkst. - 2,450 €
         if mileage:
             full_title = f"{brand_name} {model} - {year} - {mileage} - {price}"
         else:
