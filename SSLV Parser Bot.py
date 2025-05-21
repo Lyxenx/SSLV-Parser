@@ -101,7 +101,7 @@ def get_sort_keyboard() -> InlineKeyboardMarkup:
     rows.append([InlineKeyboardButton("Skip Sorting", callback_data="sort:skip")])
     return InlineKeyboardMarkup(rows)
 
-def parse_filter_options(brand_href: str) -> dict:
+def parse_filter_options(brand_href: str) -> dict: #filtru parsētājs
     if brand_href == "all":
         url = f"{BASE_URL}/lv/transport/cars/"
     else:
@@ -131,7 +131,7 @@ def parse_filter_options(brand_href: str) -> dict:
 
     return opts
 
-def labelize(name: str) -> str:# Veido tekstuālāko filtra nosaukumu
+def labelize(name: str) -> str:# Veido cilvēciski lasamo filtra nosaukumu
     return name.replace("_", " ").title()
 
 def get_filter_keyboard(user_id: int) -> InlineKeyboardMarkup:
@@ -150,7 +150,7 @@ def get_filter_keyboard(user_id: int) -> InlineKeyboardMarkup:
     ])
     return InlineKeyboardMarkup(rows)
 
-def get_filter_values_keyboard(field: str, user_id: int) -> InlineKeyboardMarkup:
+def get_filter_values_keyboard(field: str, user_id: int) -> InlineKeyboardMarkup: # 
     opts = user_states[user_id]["filter_options"][field]
 
     if opts is None:
@@ -163,11 +163,11 @@ def get_filter_values_keyboard(field: str, user_id: int) -> InlineKeyboardMarkup
         InlineKeyboardButton(label, callback_data=f"filter_val:{field}:{val}")
         for val, label in opts
     ]
-    rows = [buttons[i:i+2] for i in range(0, len(buttons), 2)]
+    rows = [buttons[i:i+2] for i in range(0, len(buttons), 2)] # 2 pogas 1 rindā
     rows.append([InlineKeyboardButton("← Back", callback_data="filter_back")])
     return InlineKeyboardMarkup(rows)
 
-def format_user_selection(user_id: int) -> str:
+def format_user_selection(user_id: int) -> str: # ziņa ar cilvēka izvēlētiem datiem
     state = user_states[user_id]
     lines = []
 
@@ -221,7 +221,7 @@ def fetch_results(state: dict) -> list:
     soup = BeautifulSoup(resp.text, "html.parser")
     results = []
 
-    for row in soup.select("tr[id^=tr_]")[:10]:
+    for row in soup.select("tr[id^=tr_]")[:10]: # auto pogas informacijas parsētājs
         cols = row.find_all("td")
         title_tag = row.select_one("a.am")
         link = urljoin(BASE_URL, title_tag['href']) if title_tag else "#"
@@ -247,10 +247,10 @@ def fetch_results(state: dict) -> list:
 
     return results
 
-app = Client("sslv_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
+app = Client("sslv_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN) # telegrama klients
 
-@app.on_message(filters.text & ~filters.command("start"))
-def numeric_input_handler(client: Client, message: Message):
+@app.on_message(filters.text & ~filters.command("start")) 
+def numeric_input_handler(client: Client, message: Message): # skaitlisko filtra vērtību apstrādātājs
     user_id = message.from_user.id
     state = user_states.get(user_id, {})
     field = state.pop("awaiting_numeric_input", None)
@@ -262,17 +262,17 @@ def numeric_input_handler(client: Client, message: Message):
         else:
             message.reply_text("Please enter a valid number.")
 
-@app.on_message(filters.command("start"))
-def start_handler(client: Client, message: Message):
+@app.on_message(filters.command("start")) # 
+def start_handler(client: Client, message: Message): /start komandes apstrādātājs
     message.reply_text("Select a car brand:", reply_markup=get_brand_keyboard(page=1))
 
 @app.on_callback_query()
-def cb_handler(client: Client, query: CallbackQuery):
+def cb_handler(client: Client, query: CallbackQuery): # pogas datu apstrādātājs
     data = query.data
     user_id = query.from_user.id
     parts = data.split(":", 2)
 
-    if parts[0] == "nav":
+    if parts[0] == "nav": 
         _, action, p = parts
         page = int(p)
         query.edit_message_reply_markup(get_brand_keyboard(page))
