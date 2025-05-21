@@ -7,7 +7,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQ
 
 API_ID = 21660803
 API_HASH = "3fd70393aaf86af7f867c99fb792cdfa"
-BOT_TOKEN = "7252666994:AAHYZdZlcDpbmexbU69t9bv_xmi8mQtKkZc"
+BOT_TOKEN = "8011379403:AAGYt-cwe8FGPmWYVlvWvsPsTk4759v8-L4"
 BASE_URL = "https://www.ss.lv"
 BRANDS_PER_PAGE = 12
 
