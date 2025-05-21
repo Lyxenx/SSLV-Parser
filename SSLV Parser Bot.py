@@ -60,29 +60,29 @@ filter_labels = {
     "sid": "Bargain Type"
 }
 
-def fetch_brands(): # Nolasa auto marku sarakstu no ss.lv
-    url = f"{BASE_URL}/lv/transport/cars/"
+def fetch_brands(): # Nolasa auto marku sarakstu no ss.lv #
+    url = f"{BASE_URL}/lv/transport/cars/" #ss.lv pamatadrese
     resp = requests.get(url)
-    resp.raise_for_status()
+    resp.raise_for_status() #pārbauda, vai pieprasījums ir veiksmīgs 
     soup = BeautifulSoup(resp.text, "html.parser")
     brand_links = []
-    pattern = re.compile(r"^/lv/transport/cars/[^/]+/$")
+    pattern = re.compile(r"^/lv/transport/cars/[^/]+/$") #ar regulāro izteiksmi pārbauda, vai saite atbilst formātam
     for a in soup.select("h4 > a[href]"): # Meklē saites uz katras markas lapām
         href = a["href"]
         if pattern.match(href):
             name = a.text.strip()
-            full_url = urljoin(BASE_URL, href)
+            full_url = urljoin(BASE_URL, href) #Atlasītās saites tiek pārveidotas par pilnām adresēm ar urljoin
             brand_links.append((name, full_url))
     print(f"Fetched {len(brand_links)} brands")
-    return brand_links
+    return brand_links #Saglabā markas nosaukumu un saiti kā tuple sarakstā
 
-def get_brand_keyboard(page: int = 1) -> InlineKeyboardMarkup:
+def get_brand_keyboard(page: int = 1) -> InlineKeyboardMarkup: #Izveidot dinamisku pogu klaviaturu ar auto markām, kas atbalsta pagināciju (lapu maiņu)
     start = (page - 1) * BRANDS_PER_PAGE
     end = start + BRANDS_PER_PAGE
     buttons = []
     for idx, (name, href) in enumerate(brand_links[start:end], start=start):
-        buttons.append(InlineKeyboardButton(name, callback_data=f"brand:{idx}"))
-    rows = [buttons[i:i+2] for i in range(0, len(buttons), 2)]
+        buttons.append(InlineKeyboardButton(name, callback_data=f"brand:{idx}")) #Atpazīst, kura marka tika izvēlēta (ar sākotnējo indeksu).
+    rows = [buttons[i:i+2] for i in range(0, len(buttons), 2)] 
     nav = []
     if page > 1:
         nav.append(InlineKeyboardButton("Prev Page", callback_data=f"nav:prev:{page-1}"))
@@ -110,7 +110,7 @@ def parse_filter_options(brand_href: str) -> dict: #filtru parsētājs
     soup = BeautifulSoup(resp.text, "html.parser")
     opts = {}
 
-    for sel in soup.find_all("select"):
+    for sel in soup.find_all("select"): #Katram <select> elementam (nolaižamajam izvēlnem) tiek iegūts:
         name = sel.get("name")
         if not name:
             continue
@@ -127,7 +127,7 @@ def parse_filter_options(brand_href: str) -> dict: #filtru parsētājs
     for inp in soup.find_all("input"):
         name = inp.get("name")
         if name and "topt[8]" in name:
-            opts[name] = None
+            opts[name] = None #Cenu filtrs (topt[8]) ir <input> lauks, nevis <select>, tāpēc tas tiek atzīmēts kā None.
 
     return opts
 
