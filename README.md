@@ -1,5 +1,4 @@
 # SSLV-Parser
-A university project to test your knowledge gained from lectures
 Automašīnas izvēle var būt sarežģīts process, ar kuru saskaramies personīgi. Mūsu projekta mērķis ir padarīt šo izvēli ērtāku un pieejamāku, izmantojot vienu no populārākajiem sociālajiem tīkliem – Telegram. Rīks spēj piedāvāt ātru un intuitīvu piekļuvi informācijai, sekojot līdzi interesantiem un izdevīgiem piedāvājumiem, saņemot personalizētu informāciju par automašīnām, kas atbilst viņu velmem un budžetam.   
 Rīka funkcionalitatei izmantojam telegrana botu, kurš: 
 	Automātiski iegūst informāciju no ss.lv - automašīnu sludinājumu portālu.
